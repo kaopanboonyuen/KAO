@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KAO: Kernel-Adaptive Optimization in Diffusion</title>
+  <link rel="icon" href="sat.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #111;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 50px 20px;
+    }
+
+    h1, h2, h3 {
+      font-weight: 800;
+      color: #111;
+    }
+
+    a {
+      color: #000;
+      text-decoration: underline;
+    }
+
+    .author {
+      font-size: 1.1rem;
+      text-align: center;
+      margin-top: -20px;
+      color: #333;
+    }
+
+    .ieee-banner {
+      text-align: center;
+      background: #f4f4f4;
+      padding: 15px;
+      border-left: 5px solid #0073e6;
+      margin: 40px 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .teaser {
+      width: 100%;
+      margin: 40px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .section {
+      margin-top: 60px;
+    }
+
+    .fig-img {
+      width: 100%;
+      margin: 30px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .caption {
+      font-size: 0.95rem;
+      color: #666;
+      margin-top: -20px;
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    .btn {
+      display: inline-block;
+      margin: 10px 10px 30px 0;
+      padding: 10px 20px;
+      background: #000;
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 600;
+      border: 1px solid #000;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    footer {
+      margin-top: 100px;
+      font-size: 0.9rem;
+      color: #999;
+      text-align: center;
+      padding-bottom: 40px;
+    }
+
+    code {
+      background: #f5f5f5;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align:center;">KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image Inpainting</h1>
+    <p class="author"><strong>Teerapong Panboonyuen</strong><br>Chulalongkorn University</p>
+
+    <div class="ieee-banner">
+      🎉 Accepted to <strong>IEEE Transactions on Geoscience and Remote Sensing (TGRS, Impact Factor: 8.6)</strong>
+    </div>
+
+    <img src="results/re_show_01.png" alt="Teaser" class="teaser">
+
+    <div style="text-align:center;">
+      <a class="btn" href="https://kaopanboonyuen.github.io/KAO/">🌐 Project Page</a>
+      <a class="btn" href="#">📄 PDF (Coming Soon)</a>
+      <a class="btn" href="#">💻 Code (Coming Soon)</a>
+    </div>
+
+    <div class="section">
+      <h2>Abstract</h2>
+      <p>
+        Satellite image inpainting is critical in remote sensing applications. We propose <strong>KAO</strong>, a diffusion-based framework enhanced with <strong>Kernel-Adaptive Optimization</strong> and <strong>Token Pyramid Transformer (TPT)</strong>, enabling dynamic kernel modulation in latent space. KAO delivers high-fidelity, structure-aware reconstructions, outperforming existing models like Stable Diffusion, RePaint, and SatDiff across VHR datasets.
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>Results Overview</h2>
+
+      <img src="results/re_show_01.png" class="fig-img">
+      <div class="caption">
+        Qualitative comparison with 7 models. KAO shows superior restoration across various occlusion patterns.
+      </div>
+
+      <img src="results/re_show_02.png" class="fig-img">
+      <div class="caption">
+        Detailed sample comparisons. KAO excels in reconstructing linear features and textures in urban scenes.
+      </div>
+
+      <!-- Loop over all re_all_* -->
+      <img src="results/re_all_01.png" class="fig-img">
+      <div class="caption">Scene 1 – Urban satellite reconstruction comparison.</div>
+
+      <img src="results/re_all_02.png" class="fig-img">
+      <div class="caption">Scene 2 – Agricultural patterns, occlusion restoration.</div>
+
+      <img src="results/re_all_03.png" class="fig-img">
+      <div class="caption">Scene 3 – Reconstruction under heavy cloud occlusions.</div>
+
+      <img src="results/re_all_04.png" class="fig-img">
+      <div class="caption">Scene 4 – Comparison on semi-urban environment.</div>
+
+      <img src="results/re_all_05.png" class="fig-img">
+      <div class="caption">Scene 5 – Multi-resolution image restoration results.</div>
+
+      <img src="results/re_all_06.png" class="fig-img">
+      <div class="caption">Scene 6 – Zoomed-in structural fidelity of KAO.</div>
+    </div>
+
+    <div class="section">
+      <h2>BibTeX Citation</h2>
+      <pre>
+@article{panboonyuen2025kao,
+  author    = {Teerapong Panboonyuen},
+  title     = {{KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image Inpainting}},
+  journal   = {IEEE Transactions on Geoscience and Remote Sensing},
+  year      = {2025}
+}
+      </pre>
+    </div>
+
+    <footer>
+      © 2025 Teerapong Panboonyuen · IEEE TGRS · Project page inspired by <a href="https://weirdlabuw.github.io/vpl/">VPL</a>
+    </footer>
+  </div>
+</body>
+</html>
