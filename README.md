@@ -84,5 +84,3 @@ Additionally, **Explicit Propagation** is incorporated into the diffusion proces
   note      = {Manuscript No. TGRS-2025-06970},
   publisher = {IEEE}
 }
-
----
