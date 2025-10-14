@@ -1,4 +1,4 @@
-# 🛰️ KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image Inpainting
+# 🛰️ KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image
 
 **Author:** [Teerapong Panboonyuen](https://kaopanboonyuen.github.io)  
 **Affiliation:** Chulalongkorn University  
@@ -77,7 +77,7 @@ Additionally, **Explicit Propagation** is incorporated into the diffusion proces
 ```bibtex
 @article{panboonyuen2025kao,
   author    = {Teerapong Panboonyuen},
-  title     = {KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image Inpainting},
+  title     = {KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image},
   journal   = {IEEE Transactions on Geoscience and Remote Sensing},
   year      = {2025},
   doi       = {10.1109/TGRS.2025.3621738},

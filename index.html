@@ -119,7 +119,7 @@
 </head>
 <body>
   <div class="container">
-    <h1 style="text-align:center;">KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image Inpainting</h1>
+    <h1 style="text-align:center;">KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image</h1>
     <p class="author"><strong>Teerapong Panboonyuen</strong><br>Chulalongkorn University</p>
 
   <div class="ieee-banner">
@@ -154,6 +154,16 @@
         Detailed sample comparisons. KAO excels in reconstructing linear features and textures in urban scenes.
       </div>
 
+      <p>
+      <strong>How to Read the Following Results:</strong><br>
+      Each scene below presents a qualitative comparison of inpainting performance across seven models. 
+      From left to right, the columns show: (1) the occluded input, (2) the ground truth image, followed by the outputs of 
+      (3) Stable Diffusion [25], (4) RePaint [16], (5) SatDiff [1], (6) DPS [26], (7) PSLD [27], and 
+      (8) <strong>our method – KAO</strong>. Each row corresponds to a different scene type—ranging from urban to agricultural landscapes and cloud-covered areas. 
+      Compare across columns to evaluate each model’s ability to restore structural details and textures. 
+      KAO consistently produces high-fidelity outputs that preserve spatial layout, align with real-world features, and outperform others in restoring occluded regions.
+      </p>
+
       <!-- Loop over all re_all_* -->
       <img src="results/re_all_01.png" class="fig-img">
       <div class="caption">Scene 1 – Urban satellite reconstruction comparison.</div>
@@ -179,7 +189,7 @@
       <pre>
 @article{panboonyuen2025kao,
   author    = {Teerapong Panboonyuen},
-  title     = {KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image Inpainting},
+  title     = {KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image},
   journal   = {IEEE Transactions on Geoscience and Remote Sensing},
   year      = {2025},
   doi       = {10.1109/TGRS.2025.3621738},
