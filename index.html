@@ -115,8 +115,23 @@
       overflow-x: auto;
       font-size: 0.9rem;
     }
+
+    mjx-container {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
   </style>
 </head>
+
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+
 <body>
   <div class="container">
     <h1 style="text-align:center;">KAO: Kernel-Adaptive Optimization</h1>
@@ -153,16 +168,134 @@
       <div class="caption">
         Detailed sample comparisons. KAO excels in reconstructing linear features and textures in urban scenes.
       </div>
+<div class="section">
+  <h2>Approach</h2>
+  <p>
+    This section introduces the mathematical foundation of <strong>Kernel-Adaptive Optimization (KAO)</strong> and how it enhances diffusion-based inpainting for satellite imagery. Our method modifies the training objective of diffusion models to be <em>spatially adaptive</em>, allowing the model to focus more on complex or ambiguous regions — a crucial property for high-fidelity satellite image restoration.
+  </p>
 
-      <p>
-      <strong>How to Read the Following Results:</strong><br>
-      Each scene below presents a qualitative comparison of inpainting performance across seven models. 
-      From left to right, the columns show: (1) the occluded input, (2) the ground truth image, followed by the outputs of 
-      (3) Stable Diffusion [25], (4) RePaint [16], (5) SatDiff [1], (6) DPS [26], (7) PSLD [27], and 
-      (8) <strong>our method – KAO</strong>. Each row corresponds to a different scene type—ranging from urban to agricultural landscapes and cloud-covered areas. 
-      Compare across columns to evaluate each model’s ability to restore structural details and textures. 
-      KAO consistently produces high-fidelity outputs that preserve spatial layout, align with real-world features, and outperform others in restoring occluded regions.
-      </p>
+  <h3>Diffusion Process</h3>
+  <p>
+    Diffusion models are trained by gradually corrupting an image \( x_0 \) into noise through a forward stochastic process:
+  </p>
+  <div class="math-display">
+    \[
+    q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{\alpha_t} x_{t-1}, (1 - \alpha_t) \mathbf{I})
+    \]
+  </div>
+  <p>
+    Here, \( \alpha_t \) controls the noise schedule at time step \( t \). Over many steps, the image becomes pure noise. The model learns to reverse this corruption — i.e., denoise:
+  </p>
+  <div class="math-display">
+    \[
+    p(x_{t-1}|x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t), \Sigma_\theta(x_t))
+    \]
+  </div>
+  <p>
+    The goal is to predict a clean sample \( x_{t-1} \) given a noisy one \( x_t \), using learned parameters \( \theta \).
+  </p>
+
+  <h3>Optimization Objective</h3>
+  <p>
+    Traditional training minimizes the Kullback-Leibler divergence between the true reverse process and the model's approximation:
+  </p>
+  <div class="math-display">
+    \[
+    \arg \min_{\theta} \mathbb{E}_{t} \left[ D_{KL}(q(x_{t-1}|x_t, x_0) \parallel p_{\theta}(x_{t-1}|x_t)) \right]
+    \]
+  </div>
+  <p>
+    This objective treats all pixels and regions equally. But in satellite images, some areas (e.g., occlusions or fine-grained structures) are harder to reconstruct and more important for downstream analysis.
+  </p>
+
+  <h3>Kernel-Adaptive Optimization (KAO)</h3>
+  <p>
+    To address this, we introduce <strong>Kernel-Adaptive Optimization</strong>, a spatially-aware training scheme. KAO modifies the loss to weight each training example based on the difference between noisy and denoised states:
+  </p>
+  <div class="math-display">
+    \[
+    \theta^* = \arg\min_\theta \mathbb{E}_{t} \left[ D_{KL}(q(x_{t-1}|x_t, x_0) \parallel p_\theta(x_{t-1} | x_t)) \cdot K(x_t, x_{t-1}) \right]
+    \]
+  </div>
+  <p>
+    The kernel \( K(x_t, x_{t-1}) \) acts as an adaptive weight, emphasizing regions with greater uncertainty or semantic change:
+  </p>
+  <div class="math-display">
+    \[
+    K(x_t, x_{t-1}) = \exp\left(-\frac{\|x_t - x_{t-1}\|^2}{2\sigma^2}\right)
+    \]
+  </div>
+  <p>
+    This formulation encourages the model to learn more from areas where its current predictions deviate most from the target. Intuitively, this means KAO focuses learning capacity on <em>harder regions</em> — such as occluded structures or fine textures — resulting in better inpainting quality, especially in geospatial contexts.
+  </p>
+
+  <h3>SDE Formulation</h3>
+  <p>
+    In continuous time, the forward diffusion can be described by a stochastic differential equation (SDE):
+  </p>
+  <div class="math-display">
+    \[
+    dX_t = f(X_t, t) \, dt + g(t) \, dW_t
+    \]
+  </div>
+  <p>
+    And the learned reverse-time process becomes:
+  </p>
+  <div class="math-display">
+    \[
+    dX_t = \left[f(X_t, t) - g(t)^2 s_\theta(X_t, t)\right] \, dt + g(t) \, d\bar{W}_t
+    \]
+  </div>
+  <p>
+    This SDE-based view supports advanced sampling strategies and allows KAO to extend to continuous-time score-based generative models.
+  </p>
+
+  <h3>Token-Level Conditioning</h3>
+  <p>
+    KAO also supports flexible conditioning in latent space. During inference, we blend representations from both the inferred and conditioning paths:
+  </p>
+  <div class="math-display">
+    \[
+    h^* = h^{infr} \odot (1 - D(m)) + h^{cond} \odot D(m)
+    \]
+  </div>
+  <p>
+    where \( D(m) \) is a learned decoder map derived from the binary mask \( m \). Finally, the denoised outputs are blended similarly:
+  </p>
+  <div class="math-display">
+    \[
+    x_{t-1} = x_{t-1}^{infr} \odot (1 - m) + x_{t-1}^{cond} \odot m
+    \]
+  </div>
+  <p>
+    This ensures spatially-aware reconstruction: occluded regions follow the conditional guidance, while unoccluded areas retain the model’s generative diversity.
+  </p>
+</div>
+
+
+
+<h3>How to Read the Following Results</h3>
+<p>
+  Each scene below presents a qualitative comparison of inpainting performance across seven models.
+  From left to right, the columns show:
+</p>
+<ul>
+  <li>(1) The occluded input</li>
+  <li>(2) The ground truth image</li>
+  <li>(3) Stable Diffusion [25]</li>
+  <li>(4) RePaint [16]</li>
+  <li>(5) SatDiff [1]</li>
+  <li>(6) DPS [26]</li>
+  <li>(7) PSLD [27]</li>
+  <li>(8) <strong>Our method – KAO</strong></li>
+</ul>
+<p>
+  Each row corresponds to a different scene type—ranging from urban to agricultural landscapes and cloud-covered areas.
+  Compare across columns to evaluate each model’s ability to restore structural details and textures.
+  <strong>KAO</strong> consistently produces high-fidelity outputs that preserve spatial layout, align with real-world features,
+  and outperform others in restoring occluded regions.
+</p>
+
 
       <!-- Loop over all re_all_* -->
       <img src="results/re_all_01.png" class="fig-img">
