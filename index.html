@@ -1,443 +1,781 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>KAO: Kernel-Adaptive Optimization in Diffusion</title>
-    <link rel="icon" href="sat.png" type="image/png" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      body {
-        font-family: "Inter", sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #fff;
-        color: #111;
-        line-height: 1.7;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAO — IEEE TGRS | Satellite Image Inpainting</title>
+
+  <link rel="icon" href="sat.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: rgba(255,255,255,0.86);
+      --text: #0d0d0d;
+      --muted: #666;
+      --line: #e9e9e9;
+      --accent: #0057ff;
+      --accent2: #7c3aed;
+      --shadow: 0 10px 40px rgba(0,0,0,0.08);
+      --radius: 24px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.75;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at top left, rgba(0,87,255,0.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(124,58,237,0.10), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(0,0,0,0.04), transparent 20%);
+      z-index: -2;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -1;
+      mask-image: radial-gradient(circle at center, black 30%, transparent 85%);
+    }
+
+    .container {
+      width: min(1300px, 92%);
+      margin: auto;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.78);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+    }
+
+    .logo {
+      font-size: 1.1rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .logo span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #111;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      min-height: 92vh;
+      display: flex;
+      align-items: center;
+      padding: 70px 0 40px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 50px;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.85);
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: var(--shadow);
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    .pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #00d26a;
+      box-shadow: 0 0 0 rgba(0,210,106,0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0,210,106,0.5); }
+      70% { box-shadow: 0 0 0 14px rgba(0,210,106,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,210,106,0); }
+    }
+
+    .hero h1 {
+      font-size: clamp(3rem, 7vw, 6.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+      font-weight: 900;
+      margin-bottom: 24px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #0057ff, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 700px;
+    }
+
+    .author {
+      margin-top: 20px;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 22px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0057ff, #7c3aed);
+      color: white;
+      box-shadow: 0 10px 30px rgba(0,87,255,0.22);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #111;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px);
+    }
+
+    .hero-image {
+      position: relative;
+    }
+
+    .hero-card {
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 30px;
+      padding: 18px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.10);
+      transform: perspective(1400px) rotateY(-8deg) rotateX(3deg);
+      transition: 0.5s ease;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .hero-card:hover {
+      transform: perspective(1400px) rotateY(0deg) rotateX(0deg);
+    }
+
+    @keyframes float {
+      0%,100% { transform: perspective(1400px) rotateY(-8deg) translateY(0px); }
+      50% { transform: perspective(1400px) rotateY(-5deg) translateY(-12px); }
+    }
+
+    .hero-card img {
+      width: 100%;
+      border-radius: 22px;
+      display: block;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      margin-top: 70px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      transition: 0.3s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .metric-title {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+
+    .section {
+      padding: 90px 0;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.06em;
+      margin-bottom: 20px;
+      font-weight: 900;
+    }
+
+    .section-subtitle {
+      max-width: 850px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      margin-bottom: 50px;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .result-showcase {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .result-showcase img,
+    .comparison-grid img {
+      width: 100%;
+      border-radius: 22px;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .result-showcase:hover img,
+    .comparison-grid:hover img {
+      transform: scale(1.02);
+    }
+
+    .caption {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .info-card {
+      padding: 28px;
+      border-radius: 24px;
+      background: white;
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: var(--shadow);
+      transition: 0.35s ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .info-card h3 {
+      font-size: 1.2rem;
+      margin-bottom: 14px;
+    }
+
+    .info-card p {
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .comparison-grid {
+      margin-top: 30px;
+    }
+
+    .comparison-grid + .comparison-grid {
+      margin-top: 50px;
+    }
+
+    .publication-banner {
+      margin-top: 30px;
+      padding: 26px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #f8fbff, #f8f5ff);
+      border: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow);
+    }
+
+    .publication-banner h3 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .publication-banner p {
+      color: var(--muted);
+    }
+
+    .impact {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(90deg, #0057ff, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .aogs {
+      margin-top: 30px;
+      padding: 30px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #0a0f1f, #101935);
+      color: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+    }
+
+    .aogs::before {
+      content: '';
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+      top: -120px;
+      right: -100px;
+    }
+
+    .aogs h3 {
+      font-size: 1.8rem;
+      margin-bottom: 14px;
+    }
+
+    .aogs p {
+      opacity: 0.9;
+      max-width: 900px;
+    }
+
+    .aogs a {
+      color: white;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-weight: 700;
+      transition: 0.3s ease;
+    }
+
+    .aogs a:hover {
+      background: white;
+      color: #111;
+    }
+
+    pre {
+      margin-top: 20px;
+      background: #0d1117;
+      color: #d1d5db;
+      padding: 28px;
+      border-radius: 22px;
+      overflow-x: auto;
+      font-size: 0.92rem;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    footer {
+      padding: 70px 0 50px;
+      text-align: center;
+      color: #888;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid,
+      .cards,
+      .metrics {
+        grid-template-columns: 1fr;
       }
 
-      .container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 50px 20px;
+      .hero {
+        min-height: auto;
+        padding-top: 60px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
       }
 
-      h1,
-      h2,
-      h3 {
-        font-weight: 800;
-        color: #111;
-      }
-
-      a {
-        color: #000;
-        text-decoration: underline;
-      }
-
-      .author {
-        font-size: 1.1rem;
-        text-align: center;
-        margin-top: -20px;
-        color: #333;
-      }
-
-      .ieee-banner {
-        text-align: center;
-        background: #f4f4f4;
-        padding: 15px;
-        border-left: 5px solid #0073e6;
-        margin: 40px 0;
-        font-size: 1rem;
-        font-weight: 600;
-      }
-
-      .teaser {
-        width: 100%;
-        margin: 40px 0;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      .hero h1 {
+        font-size: 3.3rem;
       }
 
       .section {
-        margin-top: 60px;
+        padding: 70px 0;
       }
 
-      .fig-img {
-        width: 100%;
-        margin: 30px 0;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+      .publication-banner {
+        flex-direction: column;
+        align-items: flex-start;
       }
 
-      .caption {
-        font-size: 0.95rem;
-        color: #666;
-        margin-top: -20px;
-        margin-bottom: 40px;
-        text-align: center;
+      .impact {
+        font-size: 2.6rem;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
       }
 
       .btn {
-        display: inline-block;
-        margin: 10px 10px 30px 0;
-        padding: 10px 20px;
-        background: #000;
-        color: #fff;
-        border-radius: 4px;
-        text-decoration: none;
-        font-weight: 600;
-        border: 1px solid #000;
-        transition: 0.3s;
+        width: 100%;
       }
 
-      .btn:hover {
-        background: #fff;
-        color: #000;
+      .hero-card {
+        transform: none;
       }
+    }
+  </style>
+</head>
 
-      .aogs-banner {
-        background: linear-gradient(135deg, #0b4f6c, #145374);
-        color: #ffffff;
-        padding: 14px 18px;
-        border-radius: 10px;
-        margin: 16px 0;
-        text-align: center;
-        font-size: 1.05em;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-      }
+<body>
 
-      footer {
-        margin-top: 100px;
-        font-size: 0.9rem;
-        color: #999;
-        text-align: center;
-        padding-bottom: 40px;
-      }
+<div class="grid-bg"></div>
 
-      code {
-        background: #f5f5f5;
-        padding: 2px 5px;
-        border-radius: 4px;
-        font-family: monospace;
-      }
+<nav>
+  <div class="container nav-inner">
+    <div class="logo">
+      <span>KAO</span> — IEEE TGRS 2025
+    </div>
 
-      pre {
-        background: #f5f5f5;
-        padding: 15px;
-        border-radius: 6px;
-        overflow-x: auto;
-        font-size: 0.9rem;
-      }
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#results">Results</a>
+      <a href="#publication">Publication</a>
+      <a href="#citation">Citation</a>
+    </div>
+  </div>
+</nav>
 
-      mjx-container {
-        overflow-x: auto;
-        overflow-y: hidden;
-      }
-    </style>
-  </head>
+<section class="hero">
+  <div class="container hero-grid">
 
-  <script>
-    window.MathJax = {
-      tex: {
-        inlineMath: [
-          ["$", "$"],
-          ["\\(", "\\)"],
-        ],
-      },
-      svg: { fontCache: "global" },
-    };
-  </script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
-    async
-  ></script>
+    <div>
+      <div class="badge">
+        <div class="pulse"></div>
+        IEEE Transactions on Geoscience and Remote Sensing (TGRS)
+      </div>
 
-  <body>
-    <div class="container">
-      <h1 style="text-align: center">KAO: Kernel-Adaptive Optimization</h1>
-      <p class="author">
-        <strong>Teerapong Panboonyuen</strong><br />
-        Chulalongkorn University
+      <h1>
+        Kernel-Adaptive<br>
+        <span class="gradient-text">Optimization</span>
+      </h1>
+
+      <p>
+        A world-class diffusion framework for high-resolution satellite image inpainting across urban, forest, and agricultural landscapes.
+        KAO introduces adaptive kernel-aware optimization for structure-preserving geospatial reconstruction and achieves superior fidelity over existing diffusion baselines.
       </p>
 
-      <!-- IEEE Journal Banner -->
-      <div class="ieee-banner">
-        🎉 Accepted to
-        <strong>IEEE Transactions on Geoscience and Remote Sensing</strong
-        ><br />
-        (TGRS, Impact Factor: 8.6)
+      <div class="author">
+        Teerapong Panboonyuen · Chulalongkorn University
       </div>
 
-      <!-- AOGS Conference Banner -->
-      <div class="aogs-banner">
-        🌏 This work will be <strong>presented at AOGS2026</strong><br />
-        <em>23rd Annual Meeting of the Asia Oceania Geosciences Society</em
-        ><br />
-        Fukuoka International Congress Centre, Japan · 02–07 August 2026<br />
-        <span style="font-size: 0.9em; opacity: 0.9">
-          Theme: <strong>Geoscience Horizons, Pacific Synergy</strong>
-        </span>
+      <div class="hero-buttons">
+        <a class="btn btn-primary" href="https://doi.org/10.1109/TGRS.2025.3621738" target="_blank">
+          📄 IEEE TGRS Paper
+        </a>
+
+        <a class="btn btn-secondary" href="https://github.com/kaopanboonyuen/KAO" target="_blank">
+          💻 GitHub Code
+        </a>
+
+        <a class="btn btn-secondary" href="https://arxiv.org/abs/2511.02462" target="_blank">
+          🚀 arXiv
+        </a>
       </div>
-
-      <img src="results/re_show_01.png" alt="Teaser" class="teaser" />
-
-      <div style="text-align: center; margin-top: 1em">
-        <a
-          class="btn"
-          href="https://kaopanboonyuen.github.io/KAO/"
-          target="_blank"
-          rel="noopener noreferrer"
-          >🌐 Project Page</a
-        >
-        <a
-          class="btn"
-          href="https://doi.org/10.1109/TGRS.2025.3621738"
-          target="_blank"
-          rel="noopener noreferrer"
-          >📄 Official PDF</a
-        >
-        <a
-          class="btn"
-          href="https://arxiv.org/abs/2511.02462"
-          target="_blank"
-          rel="noopener noreferrer"
-          >📄 arXiv</a
-        >
-        <a
-          class="btn"
-          href="https://github.com/kaopanboonyuen/KAO"
-          target="_blank"
-          rel="noopener noreferrer"
-          >💻 Code</a
-        >
-      </div>
-
-      <div class="section">
-        <h2>Abstract</h2>
-        <p>
-          Satellite image inpainting is critical in remote sensing applications.
-          We propose <strong>KAO</strong>, a diffusion-based framework enhanced
-          with <strong>Kernel-Adaptive Optimization</strong> and
-          <strong>Token Pyramid Transformer (TPT)</strong>, enabling dynamic
-          kernel modulation in latent space. KAO delivers high-fidelity,
-          structure-aware reconstructions, outperforming existing models like
-          Stable Diffusion, RePaint, and SatDiff across VHR datasets.
-        </p>
-      </div>
-
-      <div class="section">
-        <h2>Results Overview</h2>
-
-        <img src="results/re_show_01.png" class="fig-img" />
-        <div class="caption">
-          Qualitative comparison with 7 models. KAO shows superior restoration
-          across various occlusion patterns.
-        </div>
-
-        <img src="results/re_show_02.png" class="fig-img" />
-        <div class="caption">
-          Detailed sample comparisons. KAO excels in reconstructing linear
-          features and textures in urban scenes.
-        </div>
-        <div class="section">
-          <h2>Approach</h2>
-          <p>
-            This section introduces the mathematical foundation of
-            <strong>Kernel-Adaptive Optimization (KAO)</strong> and how it
-            enhances diffusion-based inpainting for satellite imagery. Our
-            method modifies the training objective of diffusion models to be
-            <em>spatially adaptive</em>, allowing the model to focus more on
-            complex or ambiguous regions — a crucial property for high-fidelity
-            satellite image restoration.
-          </p>
-
-          <h3>Diffusion Process</h3>
-          <p>
-            Diffusion models are trained by gradually corrupting an image \( x_0
-            \) into noise through a forward stochastic process:
-          </p>
-          <div class="math-display">
-            \[ q(x_t | x_{t-1}) = \mathcal{N}(x_t; \sqrt{\alpha_t} x_{t-1}, (1 -
-            \alpha_t) \mathbf{I}) \]
-          </div>
-          <p>
-            Here, \( \alpha_t \) controls the noise schedule at time step \( t
-            \). Over many steps, the image becomes pure noise. The model learns
-            to reverse this corruption — i.e., denoise:
-          </p>
-          <div class="math-display">
-            \[ p(x_{t-1}|x_t) = \mathcal{N}(x_{t-1}; \mu_\theta(x_t),
-            \Sigma_\theta(x_t)) \]
-          </div>
-          <p>
-            The goal is to predict a clean sample \( x_{t-1} \) given a noisy
-            one \( x_t \), using learned parameters \( \theta \).
-          </p>
-
-          <h3>Optimization Objective</h3>
-          <p>
-            Traditional training minimizes the Kullback-Leibler divergence
-            between the true reverse process and the model's approximation:
-          </p>
-          <div class="math-display">
-            \[ \arg \min_{\theta} \mathbb{E}_{t} \left[ D_{KL}(q(x_{t-1}|x_t,
-            x_0) \parallel p_{\theta}(x_{t-1}|x_t)) \right] \]
-          </div>
-          <p>
-            This objective treats all pixels and regions equally. But in
-            satellite images, some areas (e.g., occlusions or fine-grained
-            structures) are harder to reconstruct and more important for
-            downstream analysis.
-          </p>
-
-          <h3>Kernel-Adaptive Optimization (KAO)</h3>
-          <p>
-            To address this, we introduce
-            <strong>Kernel-Adaptive Optimization</strong>, a spatially-aware
-            training scheme. KAO modifies the loss to weight each training
-            example based on the difference between noisy and denoised states:
-          </p>
-          <div class="math-display">
-            \[ \theta^* = \arg\min_\theta \mathbb{E}_{t} \left[
-            D_{KL}(q(x_{t-1}|x_t, x_0) \parallel p_\theta(x_{t-1} | x_t)) \cdot
-            K(x_t, x_{t-1}) \right] \]
-          </div>
-          <p>
-            The kernel \( K(x_t, x_{t-1}) \) acts as an adaptive weight,
-            emphasizing regions with greater uncertainty or semantic change:
-          </p>
-          <div class="math-display">
-            \[ K(x_t, x_{t-1}) = \exp\left(-\frac{\|x_t -
-            x_{t-1}\|^2}{2\sigma^2}\right) \]
-          </div>
-          <p>
-            This formulation encourages the model to learn more from areas where
-            its current predictions deviate most from the target. Intuitively,
-            this means KAO focuses learning capacity on
-            <em>harder regions</em> — such as occluded structures or fine
-            textures — resulting in better inpainting quality, especially in
-            geospatial contexts.
-          </p>
-
-          <h3>SDE Formulation</h3>
-          <p>
-            In continuous time, the forward diffusion can be described by a
-            stochastic differential equation (SDE):
-          </p>
-          <div class="math-display">
-            \[ dX_t = f(X_t, t) \, dt + g(t) \, dW_t \]
-          </div>
-          <p>And the learned reverse-time process becomes:</p>
-          <div class="math-display">
-            \[ dX_t = \left[f(X_t, t) - g(t)^2 s_\theta(X_t, t)\right] \, dt +
-            g(t) \, d\bar{W}_t \]
-          </div>
-          <p>
-            This SDE-based view supports advanced sampling strategies and allows
-            KAO to extend to continuous-time score-based generative models.
-          </p>
-
-          <h3>Token-Level Conditioning</h3>
-          <p>
-            KAO also supports flexible conditioning in latent space. During
-            inference, we blend representations from both the inferred and
-            conditioning paths:
-          </p>
-          <div class="math-display">
-            \[ h^* = h^{infr} \odot (1 - D(m)) + h^{cond} \odot D(m) \]
-          </div>
-          <p>
-            where \( D(m) \) is a learned decoder map derived from the binary
-            mask \( m \). Finally, the denoised outputs are blended similarly:
-          </p>
-          <div class="math-display">
-            \[ x_{t-1} = x_{t-1}^{infr} \odot (1 - m) + x_{t-1}^{cond} \odot m
-            \]
-          </div>
-          <p>
-            This ensures spatially-aware reconstruction: occluded regions follow
-            the conditional guidance, while unoccluded areas retain the model’s
-            generative diversity.
-          </p>
-        </div>
-
-        <h3>How to Read the Following Results</h3>
-        <p>
-          Each scene below presents a qualitative comparison of inpainting
-          performance across seven models. From left to right, the columns show:
-        </p>
-        <ul>
-          <li>(1) The occluded input</li>
-          <li>(2) The ground truth image</li>
-          <li>(3) Stable Diffusion [25]</li>
-          <li>(4) RePaint [16]</li>
-          <li>(5) SatDiff [1]</li>
-          <li>(6) DPS [26]</li>
-          <li>(7) PSLD [27]</li>
-          <li>(8) <strong>Our method – KAO</strong></li>
-        </ul>
-        <p>
-          Each row corresponds to a different scene type—ranging from urban to
-          agricultural landscapes and cloud-covered areas. Compare across
-          columns to evaluate each model’s ability to restore structural details
-          and textures.
-          <strong>KAO</strong> consistently produces high-fidelity outputs that
-          preserve spatial layout, align with real-world features, and
-          outperform others in restoring occluded regions.
-        </p>
-
-        <!-- Loop over all re_all_* -->
-        <img src="results/re_all_01.png" class="fig-img" />
-        <div class="caption">
-          Scene 1 – Urban satellite reconstruction comparison.
-        </div>
-
-        <img src="results/re_all_02.png" class="fig-img" />
-        <div class="caption">
-          Scene 2 – Agricultural patterns, occlusion restoration.
-        </div>
-
-        <img src="results/re_all_03.png" class="fig-img" />
-        <div class="caption">
-          Scene 3 – Reconstruction under heavy cloud occlusions.
-        </div>
-
-        <img src="results/re_all_04.png" class="fig-img" />
-        <div class="caption">
-          Scene 4 – Comparison on semi-urban environment.
-        </div>
-
-        <img src="results/re_all_05.png" class="fig-img" />
-        <div class="caption">
-          Scene 5 – Multi-resolution image restoration results.
-        </div>
-
-        <img src="results/re_all_06.png" class="fig-img" />
-        <div class="caption">
-          Scene 6 – Zoomed-in structural fidelity of KAO.
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>BibTeX Citation</h2>
-        <pre><code>@article{panboonyuen2025kao,
-      author    = {Teerapong Panboonyuen},
-      title     = {KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image},
-      journal   = {IEEE Transactions on Geoscience and Remote Sensing},
-      year      = {2025},
-      doi       = {10.1109/TGRS.2025.3621738},
-      note      = {Manuscript No. TGRS-2025-06970},
-      publisher = {IEEE}
-    }</code></pre>
-      </div>
-
-      <footer>
-        © 2025 Teerapong Panboonyuen · IEEE TGRS · Project page inspired by
-        <a href="https://weirdlabuw.github.io/vpl/">VPL</a>
-      </footer>
     </div>
-  </body>
+
+    <div class="hero-image">
+      <div class="hero-card">
+        <img src="results/re_show_01.png" alt="KAO Teaser">
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="container">
+  <div class="metrics">
+
+    <div class="metric-card">
+      <div class="metric-title">Journal</div>
+      <div class="metric-value">IEEE TGRS</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-title">Impact Factor</div>
+      <div class="metric-value">8.6</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-title">Task</div>
+      <div class="metric-value">Satellite AI</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-title">Presented At</div>
+      <div class="metric-value">AOGS 2026</div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section" id="overview">
+  <div class="container">
+
+    <h2 class="section-title">Overview</h2>
+
+    <p class="section-subtitle">
+      KAO combines diffusion-based generative modeling with Kernel-Adaptive Optimization and Token Pyramid Transformers to reconstruct missing satellite regions with high spatial fidelity. The framework is specifically designed for Earth observation imagery where structural continuity and texture realism are critical.
+    </p>
+
+    <div class="publication-banner" id="publication">
+      <div>
+        <h3>Published in IEEE TGRS</h3>
+        <p>
+          IEEE Transactions on Geoscience and Remote Sensing — one of the world’s leading journals in remote sensing and geospatial AI.
+        </p>
+      </div>
+
+      <div class="impact">IF 8.6</div>
+    </div>
+
+    <div class="aogs">
+      <h3>🌏 Invited Presentation at AOGS 2026</h3>
+
+      <p>
+        This work has been invited for presentation at the 23rd Annual Meeting of the Asia Oceania Geosciences Society (AOGS 2026), showcasing generative AI for high-resolution satellite image inpainting across diverse geospatial environments.
+      </p>
+
+      <a href="https://www.asiaoceania.org/AOGS2026/Program-Details/34328/generative-ai-with-kernel-adaptive-diffusion-for-high-resolution-satellite-image-inpainting-across-urban,-forest,-and-agricultural-landscapes" target="_blank">
+        View Official AOGS Program
+      </a>
+    </div>
+
+    <div class="cards">
+
+      <div class="info-card">
+        <h3>Urban Reconstruction</h3>
+        <p>
+          Preserves roads, buildings, and fine-grained urban topology under large occlusions and missing regions.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>Forest & Agriculture</h3>
+        <p>
+          Maintains vegetation consistency, spatial continuity, and landscape textures across rural environments.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>Adaptive Diffusion</h3>
+        <p>
+          Dynamically modulates optimization focus using kernel-aware weighting strategies inside latent diffusion space.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section class="section" id="results">
+  <div class="container">
+
+    <h2 class="section-title">Qualitative Results</h2>
+
+    <p class="section-subtitle">
+      KAO consistently generates sharper, more realistic, and semantically coherent reconstructions than Stable Diffusion, RePaint, SatDiff, DPS, and PSLD across challenging remote sensing scenarios.
+    </p>
+
+    <div class="glass result-showcase">
+      <img src="results/re_show_01.png" alt="Main Results">
+    </div>
+
+    <div class="caption">
+      Comparison across multiple diffusion baselines. KAO restores structural layouts and textures with superior fidelity.
+    </div>
+
+    <div class="comparison-grid glass">
+      <img src="results/re_all_01.png" alt="Scene 1">
+    </div>
+
+    <div class="comparison-grid glass">
+      <img src="results/re_all_02.png" alt="Scene 2">
+    </div>
+
+    <div class="comparison-grid glass">
+      <img src="results/re_all_03.png" alt="Scene 3">
+    </div>
+
+    <div class="comparison-grid glass">
+      <img src="results/re_all_04.png" alt="Scene 4">
+    </div>
+
+    <div class="comparison-grid glass">
+      <img src="results/re_all_05.png" alt="Scene 5">
+    </div>
+
+    <div class="comparison-grid glass">
+      <img src="results/re_all_06.png" alt="Scene 6">
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+
+    <h2 class="section-title">Technical Highlights</h2>
+
+    <div class="cards">
+
+      <div class="info-card">
+        <h3>Kernel-Adaptive Optimization</h3>
+        <p>
+          Spatially adaptive weighting allows the diffusion process to focus on difficult reconstruction regions and semantic inconsistencies.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>Diffusion Prior Modeling</h3>
+        <p>
+          Robust latent diffusion sampling improves realism and preserves geospatial continuity under severe missing data conditions.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h3>World-Class Remote Sensing AI</h3>
+        <p>
+          Designed for modern geospatial foundation models, Earth observation systems, and large-scale satellite intelligence.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section class="section" id="citation">
+  <div class="container">
+
+    <h2 class="section-title">BibTeX</h2>
+
+<pre><code>@article{panboonyuen2025kao,
+  author    = {Teerapong Panboonyuen},
+  title     = {KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image Inpainting},
+  journal   = {IEEE Transactions on Geoscience and Remote Sensing},
+  year      = {2025},
+  doi       = {10.1109/TGRS.2025.3621738},
+  publisher = {IEEE}
+}
+</code></pre>
+
+  </div>
+</section>
+
+<footer>
+  © 2025 Teerapong Panboonyuen · IEEE TGRS · Generative Remote Sensing AI
+</footer>
+
+</body>
 </html>
