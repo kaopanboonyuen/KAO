@@ -72,8 +72,7 @@
       position: sticky;
       top: 0;
       z-index: 999;
-      backdrop-filter: blur(20px);
-      background: rgba(255,255,255,0.78);
+      background: rgba(255,255,255,0.96);
       border-bottom: 1px solid rgba(0,0,0,0.05);
     }
 
@@ -224,15 +223,14 @@
     }
 
     .hero-card {
-      background: rgba(255,255,255,0.72);
-      backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.95);
       border: 1px solid rgba(0,0,0,0.06);
       border-radius: 30px;
       padding: 18px;
       box-shadow: 0 30px 60px rgba(0,0,0,0.10);
       transform: perspective(1400px) rotateY(-8deg) rotateX(3deg);
-      transition: 0.5s ease;
-      animation: float 6s ease-in-out infinite;
+      transition: transform 0.5s ease;
+      will-change: transform;
     }
 
     .hero-card:hover {
@@ -258,13 +256,12 @@
     }
 
     .metric-card {
-      background: var(--card);
-      backdrop-filter: blur(14px);
+      background: #fff;
       border: 1px solid rgba(0,0,0,0.06);
       border-radius: 24px;
       padding: 28px;
       box-shadow: var(--shadow);
-      transition: 0.3s ease;
+      transition: transform 0.25s ease;
     }
 
     .metric-card:hover {
@@ -306,8 +303,7 @@
     }
 
     .glass {
-      background: rgba(255,255,255,0.82);
-      backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.95);
       border: 1px solid rgba(0,0,0,0.06);
       border-radius: 28px;
       padding: 20px;
@@ -317,6 +313,7 @@
     .result-showcase {
       overflow: hidden;
       position: relative;
+      contain: layout style;
     }
 
     .result-showcase img,
@@ -324,12 +321,6 @@
       width: 100%;
       border-radius: 22px;
       display: block;
-      transition: transform 0.5s ease;
-    }
-
-    .result-showcase:hover img,
-    .comparison-grid:hover img {
-      transform: scale(1.02);
     }
 
     .caption {
@@ -688,7 +679,7 @@
     </p>
 
     <div class="glass result-showcase">
-      <img src="results/re_show_01.png" alt="Main Results">
+      <img src="results/re_show_01.png" alt="Main Results" loading="lazy" decoding="async">
     </div>
 
     <div class="caption">
@@ -696,27 +687,27 @@
     </div>
 
     <div class="comparison-grid glass">
-      <img src="results/re_all_01.png" alt="Scene 1">
+      <img src="results/re_all_01.png" alt="Scene 1" loading="lazy" decoding="async">
     </div>
 
     <div class="comparison-grid glass">
-      <img src="results/re_all_02.png" alt="Scene 2">
+      <img src="results/re_all_02.png" alt="Scene 2" loading="lazy" decoding="async">
     </div>
 
     <div class="comparison-grid glass">
-      <img src="results/re_all_03.png" alt="Scene 3">
+      <img src="results/re_all_03.png" alt="Scene 3" loading="lazy" decoding="async">
     </div>
 
     <div class="comparison-grid glass">
-      <img src="results/re_all_04.png" alt="Scene 4">
+      <img src="results/re_all_04.png" alt="Scene 4" loading="lazy" decoding="async">
     </div>
 
     <div class="comparison-grid glass">
-      <img src="results/re_all_05.png" alt="Scene 5">
+      <img src="results/re_all_05.png" alt="Scene 5" loading="lazy" decoding="async">
     </div>
 
     <div class="comparison-grid glass">
-      <img src="results/re_all_06.png" alt="Scene 6">
+      <img src="results/re_all_06.png" alt="Scene 6" loading="lazy" decoding="async">
     </div>
 
   </div>
