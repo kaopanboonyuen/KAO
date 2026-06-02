@@ -17,7 +17,7 @@
 ## 🌐 Project Page
 
 🔗 [**Visit the Project Page →**](https://kaopanboonyuen.github.io/KAO/)  
-📄 PDF — [https://ieeexplore.ieee.org/document/11204656/](https://ieeexplore.ieee.org/document/11204656/)
+📄 PDF — [https://ieeexplore.ieee.org/document/11204656/](https://ieeexplore.ieee.org/document/11204656/)  
 💻 Code — [https://github.com/kaopanboonyuen/KAO](https://github.com/kaopanboonyuen/KAO)
 
 ---
