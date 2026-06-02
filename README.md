@@ -8,7 +8,7 @@
 
 ## 🎉 Publication
 
-> 🏅 **Accepted in [IEEE Transactions on Geoscience and Remote Sensing (TGRS)](https://ieeexplore.ieee.org/)**  
+> 🏅 **Accepted in [IEEE Transactions on Geoscience and Remote Sensing (TGRS)](https://ieeexplore.ieee.org/document/11204656/)**  
 > 📈 *Impact Factor: 8.6*  
 > 🗓️ *2025*
 
@@ -17,8 +17,8 @@
 ## 🌐 Project Page
 
 🔗 [**Visit the Project Page →**](https://kaopanboonyuen.github.io/KAO/)  
-📄 PDF — *Coming Soon*  
-💻 Code — *Coming Soon*
+📄 PDF — [https://ieeexplore.ieee.org/document/11204656/](https://ieeexplore.ieee.org/document/11204656/)
+💻 Code — [https://github.com/kaopanboonyuen/KAO](https://github.com/kaopanboonyuen/KAO)
 
 ---
 
