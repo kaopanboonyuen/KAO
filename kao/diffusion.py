@@ -18,7 +18,7 @@
 #     ELBO objective   : Section III-A (multi-line eq.)
 #     KAO-modulated KL : Sec III-C, Eq. (7)
 # =============================================================================
-# MIT License — Copyright (c) 2025 Teerapong Panboonyuen
+# MIT License — Copyright (c) 2026 Teerapong Panboonyuen
 # =============================================================================
 
 import torch

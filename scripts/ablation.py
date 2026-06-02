@@ -20,7 +20,7 @@
 #   Section V-A: "Evaluating the Role of Kernel Resampling and
 #                 Latent Conditioning"
 # =============================================================================
-# MIT License — Copyright (c) 2025 Teerapong Panboonyuen
+# MIT License — Copyright (c) 2026 Teerapong Panboonyuen
 # =============================================================================
 
 import sys

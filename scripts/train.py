@@ -17,7 +17,7 @@
 #     • Cosine decay schedule
 #     • 250,000 total training iterations
 # =============================================================================
-# MIT License — Copyright (c) 2025 Teerapong Panboonyuen
+# MIT License — Copyright (c) 2026 Teerapong Panboonyuen
 # =============================================================================
 
 import os

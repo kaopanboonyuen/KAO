@@ -23,7 +23,7 @@
 #   Ablation results (Table II):
 #     Full model (2 EP modules):  LPIPS=0.059, FID=6.13
 # =============================================================================
-# MIT License — Copyright (c) 2025 Teerapong Panboonyuen
+# MIT License — Copyright (c) 2026 Teerapong Panboonyuen
 # =============================================================================
 
 import torch

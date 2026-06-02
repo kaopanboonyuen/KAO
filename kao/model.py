@@ -32,7 +32,6 @@ import torch.nn.functional as F
 from einops import rearrange
 from typing import Optional, Tuple
 
-
 # ---------------------------------------------------------------------------
 # Gaussian RBF Kernel  (Section III-C, Eq. 8 in the paper)
 # K(X_t, X_{t-1}) = exp(-||X_t - X_{t-1}||^2 / 2σ^2)
