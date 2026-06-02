@@ -1,0 +1,41 @@
+# =============================================================================
+# KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image
+# =============================================================================
+# Author  : Teerapong Panboonyuen (aka Kao Panboonyuen)
+# Journal : IEEE Transactions on Geoscience and Remote Sensing (IF: 8.9)
+# DOI     : https://doi.org/10.1109/TGRS.2025.3621738
+# =============================================================================
+# Training config — DeepGlobe 2018 Dataset (Section IV-B)
+# =============================================================================
+
+# Dataset
+dataset: deepglobe
+data_root: /data/deepglobe
+image_size: 256
+mask_type: irregular   # cloud/mist-like masks for VHR data
+
+# Model architecture (same as Massachusetts, Section III-D)
+latent_channels: 256
+tpt_depth: 4
+tpt_heads: 8
+tpt_pyramid: 3
+num_ep: 2
+kernel_sigma: 1.0
+
+# Diffusion process
+num_timesteps: 1000
+beta_schedule: cosine
+
+# Training (Appendix — Training Setup)
+batch_size: 16
+lr: 5.0e-5
+weight_decay: 0.01
+total_iters: 250000
+warmup_ratio: 0.10
+num_workers: 4
+
+# Logging
+log_every: 100
+save_every: 5000
+output_dir: ./checkpoints/deepglobe
+seed: 42
