@@ -1,0 +1,25 @@
+# =============================================================================
+# KAO: Kernel-Adaptive Optimization in Diffusion for Satellite Image
+# Author  : Teerapong Panboonyuen (aka Kao Panboonyuen)
+# Journal : IEEE Transactions on Geoscience and Remote Sensing (IF: 8.9)
+# DOI     : https://doi.org/10.1109/TGRS.2025.3621738
+# =============================================================================
+# Core dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+einops>=0.7.0
+numpy>=1.24.0
+Pillow>=9.0.0
+tqdm>=4.65.0
+PyYAML>=6.0
+
+# Evaluation metrics
+torchmetrics>=1.0.0
+lpips>=0.1.4
+
+# Optional: irregular mask generation
+opencv-python>=4.8.0
+
+# Visualisation (for notebooks)
+matplotlib>=3.7.0
+seaborn>=0.12.0
